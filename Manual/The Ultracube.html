@@ -1,4 +1,3 @@
-<meta http-equiv="refresh" content="1">
 <html>
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -76,10 +75,10 @@
 
                 <p class="flavour-text">Oh I know this one! Wait, it looks different... Are there more now?</p>
 
-                <p>Observe the sequence of five 5D rotations of the ultracube. There is a brief pause when the sequence repeats.</p>
-                <p>From the first four rotations, obtain four ultracube faces as listed in the <em>Face</em> column in the below table.</p>
+                <p>Observe the sequence of five 5D rotations of the Ultracube. There is a brief pause when the sequence repeats.</p>
+                <p>From the first four rotations, obtain four Ultracube faces as listed in the <em>Face</em> column in the below table.</p>
                 <p>From the fifth rotation, obtain a sequence of colors as listed in the <em>Order</em> column in the below table.</p>
-				<p>Basically like in the 4D edition. The only difference is that there is a few more combinations and there is two 'weird' axes now, and a few more lines.</p>
+				<p>The Ultracube is very similar to the Hypercube, the only difference is that there is a few more combinations and there is two 'weird' axes now, and a few more lines.</p>
 
                 <table class="ultracube-rotations">
                     <tr><th>Rot.</th><th>Face</th><th>Order</th><td class="sep" rowspan="20"></td><th>Rot.</th><th>Face</th><th>Order</th></tr>
@@ -98,13 +97,79 @@
 					<tr><th>WV</th><td class="face">pong-zag-back</td><td class="order">YRGB</td><th>VW</th><td class="face">ping-bottom-back</td><td class="order">BYGR</td></tr>
 
 				</table>
-
-                <p>The rotations are identified by which positive axis direction rotates into which other positive axis direction.</p>
-
+				<p>The rotations are identified by observing a vertex and checking where it moves to and where it came from. Those two movements will give you an axis pair.</p>
+				<p>If you end up with a rotation pair like <code>-X+W</code> or <code>+V-Z</code> then you need to flip the letters and remove the minuses, resulting in <code>WX</code> and <code>ZV</code>. If there are two minuses then remove them both, so <code>-X-Z</code> would turn into <code>XZ</code>.</p>
+                
                 <svg style='width: 7.5cm; float: right' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 125 110">
-                <defs><marker id="b" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M-10 0l-4 4L0 0l-14-4z"/></marker><marker id="a" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M10 0l4-4L0 0l14 4z"/></marker><marker id="f" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M-10 0l-4 4L0 0l-14-4z"/></marker><marker id="e" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M10 0l4-4L0 0l14 4z"/></marker><marker id="d" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M-10 0l-4 4L0 0l-14-4z"/></marker><marker id="c" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M10 0l4-4L0 0l14 4z"/></marker></defs><g transform="translate(0 -464.953)"><path fill="#d2d2d2" stroke="#000" stroke-linecap="round" stroke-width=".5" d="M20 478.953v80h80v-60a20 20 0 0 1-20-20z" style="marker:none"/><path fill="none" stroke="#a0a0a0" marker-end="url(#b)" marker-start="url(#a)" d="M110 488.953l-77.5 77.5"/><path fill="none" stroke="#000" stroke-linecap="round" d="M90 528.953H50M30 548.953l20-20M50 488.953l-20 20M90 528.953l-20 20"/><circle cx="92.5" cy="486.453" r="7.5" fill="silver" fill-opacity=".667" stroke="#000" stroke-linecap="round" stroke-width=".5" style="marker:none"/><path fill="none" stroke="#000" stroke-linecap="round" d="M50 488.953h40"/><path fill="none" stroke="#a0a0a0" marker-end="url(#d)" marker-start="url(#c)" d="M110 533.953H10"/><text x="17.5" y="523.953" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:end" text-anchor="end" word-spacing="0"><tspan x="17.5" y="523.953">−X</tspan><tspan x="17.5" y="529.953">left</tspan></text><text x="102.5" y="523.953" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:start" word-spacing="0"><tspan x="102.5" y="523.953">+X</tspan><tspan x="102.5" y="529.953">right</tspan></text><text x="37.5" y="536.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:center" text-anchor="middle" word-spacing="0"><tspan x="37.5" y="536.453">X</tspan></text><path fill="none" stroke="#a0a0a0" marker-end="url(#f)" marker-start="url(#e)" d="M60 468.953v100"/><path fill="none" stroke="#000" stroke-linecap="round" d="M70 548.953H30"/><text x="60" y="501.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:center" text-anchor="middle" word-spacing="0"><tspan x="60" y="501.453">Z</tspan></text><text x="62.5" y="471.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:start" word-spacing="0"><tspan x="62.5" y="471.453">+Z</tspan><tspan x="62.5" y="477.453">back</tspan></text><text x="62.5" y="566.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:start" word-spacing="0"><tspan x="62.5" y="566.453">−Z</tspan><tspan x="62.5" y="572.453">front</tspan></text><path fill="none" stroke="#000" stroke-linecap="round" d="M70 508.953v40M90 488.953v40M30 548.953v-40"/><text x="81.25" y="520.203" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:center" text-anchor="middle" word-spacing="0"><tspan x="81.25" y="520.203">W</tspan></text><text x="50" y="566.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:end" text-anchor="end" word-spacing="0"><tspan x="50" y="566.453">−W</tspan><tspan x="50" y="572.453">zig</tspan></text><text x="118.75" y="495.203" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:end" text-anchor="end" word-spacing="0"><tspan x="118.75" y="495.203">+W</tspan><tspan x="118.75" y="501.203">zag</tspan></text><path fill="none" stroke="#000" stroke-linecap="round" d="M90 488.953l-20 20M50 488.953v40M70 508.953H30"/></g></svg>
-
-                <p>To begin, touch any vertex of the ultracube. This will cause the rotations to cease.</p>
+					<defs>
+						<marker id="b" orient="auto" overflow="visible">
+						<path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M-10 0l-4 4L0 0l-14-4z"/></marker>
+						<marker id="a" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M10 0l4-4L0 0l14 4z"/></marker>
+						<marker id="f" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M-10 0l-4 4L0 0l-14-4z"/></marker>
+						<marker id="e" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M10 0l4-4L0 0l14 4z"/></marker>
+						<marker id="d" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M-10 0l-4 4L0 0l-14-4z"/></marker>
+						<marker id="c" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.0664" d="M10 0l4-4L0 0l14 4z"/></marker>
+					</defs>
+					<g transform="translate(0 -464.953)">
+						<path fill="#d2d2d2" stroke="#000" stroke-linecap="round" stroke-width=".5" d="M20 478.953v80h80v-60a20 20 0 0 1-20-20z" style="marker:none"/>
+						<path fill="none" stroke="#a0a0a0" marker-end="url(#b)" marker-start="url(#a)" d="M105 488.953l-77.5 77.5"/>
+						<path fill="none" stroke="#000" stroke-linecap="round" d="M90 528.953H50M30 548.953l20-20M50 488.953l-20 20M90 528.953l-20 20"/>
+						<circle cx="92.5" cy="486.453" r="7.5" fill="silver" fill-opacity=".667" stroke="#000" stroke-linecap="round" stroke-width=".5" style="marker:none"/>
+						<path fill="none" stroke="#000" stroke-linecap="round" d="M50 488.953h40"/>
+						<path fill="none" stroke="#a0a0a0" marker-end="url(#d)" marker-start="url(#c)" d="M110 533.953H10"/>
+						<text x="17.5" y="523.953" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:end" text-anchor="end" word-spacing="0">
+							<tspan x="17.5" y="523.953">−X</tspan>
+							<tspan x="17.5" y="529.953">left</tspan>
+						</text>
+						<text x="102.5" y="523.953" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:start" word-spacing="0">
+							<tspan x="102.5" y="523.953">+X</tspan>
+							<tspan x="102.5" y="529.953">right</tspan>
+						</text>
+						<text x="37.5" y="536.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:center" text-anchor="middle" word-spacing="0">
+							<tspan x="37.5" y="536.453">X</tspan>
+						</text>
+							<path fill="none" stroke="#a0a0a0" marker-end="url(#f)" marker-start="url(#e)" d="M60 468.953v100"/>
+							<path fill="none" stroke="#000" stroke-linecap="round" d="M70 548.953H30"/>
+						<text x="60" y="501.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:center" text-anchor="middle" word-spacing="0">
+							<tspan x="60" y="501.453">Z</tspan>
+						</text>
+						<text x="62.5" y="471.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:start" word-spacing="0">
+							<tspan x="62.5" y="471.453">+Z</tspan>
+							<tspan x="62.5" y="477.453">back</tspan>
+						</text>
+						<text x="62.5" y="566.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:start" word-spacing="0">
+							<tspan x="62.5" y="566.453">−Z</tspan>
+							<tspan x="62.5" y="572.453">front</tspan>
+						</text>
+						<path fill="none" stroke="#000" stroke-linecap="round" d="M70 508.953v40M90 488.953v40M30 548.953v-40"/>
+						<text x="81.25" y="520.203" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:center" text-anchor="middle" word-spacing="0">
+							<tspan x="80" y="515.203">W</tspan>
+						</text>
+						<text x="50" y="566.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:end" text-anchor="end" word-spacing="0">
+							<tspan x="25" y="566.453">−W</tspan>
+							<tspan x="25" y="572.453">zig</tspan>
+						</text>
+						<path fill="none" stroke="#a0a0a0" marker-end="url(#b)" marker-start="url(#a)" d="M85 468.953l-45 100"/>
+						
+						<text x="55" y="566.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:end" text-anchor="end" word-spacing="0">
+							<tspan x="55" y="567.453">+V</tspan>
+							<tspan x="55" y="573.453">pong</tspan>
+						</text>
+						<text x="85" y="468.453" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:end" text-anchor="end" word-spacing="0">
+							<tspan x="97" y="470.453">-V</tspan>
+							<tspan x="101" y="477.453">ping</tspan>
+						</text>
+						<text x="118.75" y="495.203" font-family="Special Elite" font-size="6.667" font-weight="400" letter-spacing="0" style="line-height:89.99999762%;-inkscape-font-specification:'Special Elite';text-align:end" text-anchor="end" word-spacing="0">
+							<tspan x="118.75" y="495.203">+W</tspan>
+							<tspan x="118.75" y="501.203">zag</tspan>
+						</text>
+						<path fill="none" stroke="#000" stroke-linecap="round" d="M90 488.953l-20 20M50 488.953v40M70 508.953H30"/>
+					</g>
+				</svg>
+				
+				
+				
+				<p>To begin, touch any vertex of the Ultracube. This will cause the rotations to cease.</p>
                 <p>On the face identified by the first rotation, touch the vertex of the color identified by the first color in the color order obtained earlier.</p>
                 <p>Repeat this with the remaining rotations and colors in the sequence.</p>
                 <p>A mistake will cause the rotations to resume. The sequence of rotations remains the same, but the vertices may be colored differently. Receiving a strike will also reset the sequence number, meaning you will have to re-enter all vertices you already entered.</p>
