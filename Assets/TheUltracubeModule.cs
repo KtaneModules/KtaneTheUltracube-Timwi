@@ -92,10 +92,12 @@ public class TheUltracubeModule : MonoBehaviour
         }
         Debug.LogFormat(@"[The Ultracube #{0}] Rotations are: {1}", _moduleId, _rotations.Select(rot => _rotationNames[rot]).Join(", "));
 
+
+        /* manual generation code
         var seq = "XY,XZ,XW,XV,YZ,YW,YV,ZW,ZV,WV".Split(',').ToList();
         Debug.Log("All rotations are: "+seq.Join(" "));
         string row = "<tr><th>{0}</th><td class=\"face\">{1}</td><td class=\"order\">{2}</td><th>{3}</th><td class=\"face\">{4}</td><td class=\"order\">{5}</td></tr>\n";
-        string table = "";
+        string table = ""; // table html result
 
 
         for (int i = 0; i < seq.Count; i++)
@@ -107,7 +109,8 @@ public class TheUltracubeModule : MonoBehaviour
                  seq[i].Reverse().Join(""),
                 StringifyShape(_faces[Array.IndexOf(_rotationNames, seq[i][1].ToString() + seq[i][0])]).Replace(" face", null),
                 _colorPermutations[Array.IndexOf(_rotationNames, seq[i][1].ToString() + seq[i][0])].Select(x => _colorNames[x].ToUpperInvariant().First()).Join("")); ;
-        }
+        }         
+         */
 
         for (var i = 0; i < 1 << 5; i++)
             Vertices[i].OnInteract = VertexClick(i);
