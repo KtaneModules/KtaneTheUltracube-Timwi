@@ -41,14 +41,14 @@ public class TheUltracubeModule : MonoBehaviour
     private int _correctVertex;
 
     private Material _edgesMat, _verticesMat, _facesMat;
-    private List<Mesh> _generatedMeshes = new List<Mesh>();
+    private readonly List<Mesh> _generatedMeshes = new List<Mesh>();
     private static readonly string[] _rotationNames = "XYZWV".SelectMany(one => "XYZWV".Where(two => two != one).Select(two => string.Concat(one, two))).ToArray();
     private static readonly string[][] _dimensionNames = new[] { new[] { "left", "right" }, new[] { "bottom", "top" }, new[] { "front", "back" }, new[] { "zig", "zag" }, new[] { "ping", "pong" } };
     private static readonly string[] _colorNames = new[] { "red", "yellow", "green", "blue" };
     private static readonly Color[] _vertexColorValues = "e54747,e5e347,47e547,3ba0f1".Split(',').Select(str => new Color(Convert.ToInt32(str.Substring(0, 2), 16) / 255f, Convert.ToInt32(str.Substring(2, 2), 16) / 255f, Convert.ToInt32(str.Substring(4, 2), 16) / 255f)).ToArray();
     private static readonly int[] _shapeOrder = { 4, 3, 1, 2, 0 };
 
-    void Start()
+    public void Start()
     {
         this._moduleId = _moduleIdCounter++;
 
@@ -64,7 +64,7 @@ public class TheUltracubeModule : MonoBehaviour
         for (int i = 0; i < this.Faces.Length; i++)
             this.Faces[i].GetComponent<MeshRenderer>().sharedMaterial = this._facesMat;
 
-        SetUltracube(getUnrotatedVertices().Select(p => p.Project()).ToArray(), setFaces: true);
+        SetUltracube(GetUnrotatedVertices().Select(p => p.Project()).ToArray(), setFaces: true);
 
         // RULE SEED
         var rnd = this.RuleSeedable.GetRNG();
@@ -119,7 +119,7 @@ public class TheUltracubeModule : MonoBehaviour
         this._rotationCoroutine = StartCoroutine(RotateUltracube());
     }
 
-    private Point5D[] getUnrotatedVertices()
+    private Point5D[] GetUnrotatedVertices()
     {
         return Enumerable.Range(0, 1 << 5).Select(i => new Point5D((i & 1) != 0 ? 1 : -1, (i & 2) != 0 ? 1 : -1, (i & 4) != 0 ? 1 : -1, (i & 8) != 0 ? 1 : -1, (i & 16) != 0 ? 1 : -1)).ToArray();
     }
@@ -308,7 +308,7 @@ public class TheUltracubeModule : MonoBehaviour
 
                 while (elapsed < duration)
                 {
-                    var angle = easeInOutQuad(elapsed, 0, Mathf.PI / 2, duration);
+                    var angle = EaseInOutQuad(elapsed, 0, Mathf.PI / 2, duration);
                     var matrix = new double[25];
                     for (int i = 0; i < 5; i++)
                         for (int j = 0; j < 5; j++)
@@ -335,7 +335,7 @@ public class TheUltracubeModule : MonoBehaviour
         this._rotationCoroutine = null;
     }
 
-    private static float easeInOutQuad(float t, float start, float end, float duration)
+    private static float EaseInOutQuad(float t, float start, float end, float duration)
     {
         var change = end - start;
         t /= duration / 2;
@@ -390,10 +390,10 @@ public class TheUltracubeModule : MonoBehaviour
 
     // copied from the original hypercube module.
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} go [makes the ultracube stop rotating] | !{0} zig-bottom-front-left [presses a vertex when the hypercube is not rotating anymore]";
+    public readonly string TwitchHelpMessage = @"!{0} go [makes the ultracube stop rotating] | !{0} zig-bottom-front-left [presses a vertex when the hypercube is not rotating anymore]";
 #pragma warning restore 414
 
-    IEnumerator ProcessTwitchCommand(string command)
+    public IEnumerator ProcessTwitchCommand(string command)
     {
         if (this._rotationCoroutine != null && Regex.IsMatch(command, @"^\s*(go|activate|stop|run|start|on|off)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
