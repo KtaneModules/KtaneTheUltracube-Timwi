@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using TheUltracube;
 using UnityEngine;
 
@@ -387,8 +388,45 @@ public class TheUltracubeModule : MonoBehaviour
         }
     }
 
-    private KMSelectable[] ProcessTwitchCommand(string command)
+    // copied from the original hypercube module.
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} go [makes the ultracube stop rotating] | !{0} zig-bottom-front-left [presses a vertex when the hypercube is not rotating anymore]";
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command)
     {
-        return null;
+        if (_rotationCoroutine != null && Regex.IsMatch(command, @"^\s*(go|activate|stop|run|start|on|off)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            yield return new[] { Vertices[0] };
+            yield break;
+        }
+
+        Match m;
+        if (_rotationCoroutine == null && (m = Regex.Match(command, string.Format(@"^\s*((?:{0})(?:[- ,;]*(?:{0}))*)\s*$", _dimensionNames.SelectMany(x => x).Join("|")), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
+        {
+            var elements = m.Groups[1].Value.Split(new[] { ' ', ',', ';', '-' }, StringSplitOptions.RemoveEmptyEntries);
+            if (elements.Length != 5)
+            {
+                yield return "sendtochaterror Dude, it’s a 5D ultracube, you gotta have 5 dimensions.";
+                yield break;
+            }
+            var dimensions = elements.Select(el => _dimensionNames.ToList().FindIndex(d => d.Any(dn => dn.EqualsIgnoreCase(el)))).ToArray();
+            var invalid = Enumerable.Range(0, 4).SelectMany(i => Enumerable.Range(i + 1, 4 - i).Where(j => dimensions[i] == dimensions[j]).Select(j => new { i, j })).FirstOrDefault();
+            if (invalid != null)
+            {
+                yield return elements[invalid.i].EqualsIgnoreCase(elements[invalid.j])
+                    ? string.Format("sendtochaterror Dude, you wrote “{0}” twice.", elements[invalid.i], elements[invalid.j])
+                    : string.Format("sendtochaterror Dude, “{0}” and “{1}” doesn’t jive.", elements[invalid.i], elements[invalid.j]);
+                yield break;
+            }
+            var vertexIx = 0;
+            for (int i = 0; i < 5; i++)
+                vertexIx |= _dimensionNames[dimensions[i]].ToList().FindIndex(dn => dn.EqualsIgnoreCase(elements[i])) << dimensions[i];
+            yield return null;
+            yield return new[] { Vertices[vertexIx] };
+        }
     }
+
+    // -- end copy --
 }
