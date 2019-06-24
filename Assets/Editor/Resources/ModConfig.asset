@@ -13,24 +13,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: TheUltracube
   title: The Ultracube
-  description: 'Oh I know this one! Wait, it looks different... Is there more lines
-    now?
-
-
-    Module initially created by Timwi, finished by GHXX.
-
-
-    Fair warning: This module is very complex and can be extremely difficult to understand
-    if you havent mastered The Hypercube. Please keep this in mind when judging this
-    module.
-
-
-    It does support Twitch Plays too!
-
-
-    [url=http://ktane.timwi.de/PDF/The%20Ultracube.pdf]Manual PDF[/url]
-
-    [url=http://ktane.timwi.de/HTML/The%20Ultracube.html]Manual HTML[/url]'
+  description: "Oh I know this one! Wait, it looks different... Are there more lines
+    now?\n\nModule created by Timwi and GHXX.\n\nFair warning: This module is very
+    complex and can be extremely difficult to understand if you haven\u2019t played
+    The Hypercube. Please keep this in mind when judging this module.\n\n[url=http://ktane.timwi.de/PDF/The%20Ultracube.pdf]Manual
+    PDF[/url]\n[url=http://ktane.timwi.de/HTML/The%20Ultracube.html]Manual HTML[/url]"
   version: 1.0
   outputFolder: build
   previewImage: {fileID: 2800000, guid: f04a755d3d418e24b84bafd8ca72f006, type: 3}

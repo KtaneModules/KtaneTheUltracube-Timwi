@@ -42,82 +42,90 @@ public class TheUltracubeModule : MonoBehaviour
 
     private Material _edgesMat, _verticesMat, _facesMat;
     private readonly List<Mesh> _generatedMeshes = new List<Mesh>();
-    private static readonly string[] _rotationNames = "XYZWV".SelectMany(one => "XYZWV".Where(two => two != one).Select(two => string.Concat(one, two))).ToArray();
+    private static readonly string[] _rotationNames = new[] { "XY", "YX", "XZ", "ZX", "XW", "WX", "XV", "VX", "YZ", "ZY", "YW", "WY", "YV", "VY", "ZW", "WZ", "ZV", "VZ", "WV", "VW" };
     private static readonly string[][] _dimensionNames = new[] { new[] { "left", "right" }, new[] { "bottom", "top" }, new[] { "front", "back" }, new[] { "zig", "zag" }, new[] { "ping", "pong" } };
     private static readonly string[] _colorNames = new[] { "red", "yellow", "green", "blue" };
     private static readonly Color[] _vertexColorValues = "e54747,e5e347,47e547,3ba0f1".Split(',').Select(str => new Color(Convert.ToInt32(str.Substring(0, 2), 16) / 255f, Convert.ToInt32(str.Substring(2, 2), 16) / 255f, Convert.ToInt32(str.Substring(4, 2), 16) / 255f)).ToArray();
     private static readonly int[] _shapeOrder = { 4, 3, 1, 2, 0 };
 
-    public void Start()
+    void Start()
     {
-        this._moduleId = _moduleIdCounter++;
+        _moduleId = _moduleIdCounter++;
 
-        this._edgesMat = this.Edges[0].GetComponent<MeshRenderer>().material;
-        for (int i = 0; i < this.Edges.Length; i++)
-            this.Edges[i].GetComponent<MeshRenderer>().sharedMaterial = this._edgesMat;
+        _edgesMat = Edges[0].GetComponent<MeshRenderer>().material;
+        for (int i = 0; i < Edges.Length; i++)
+            Edges[i].GetComponent<MeshRenderer>().sharedMaterial = _edgesMat;
 
-        this._verticesMat = this.Vertices[0].GetComponent<MeshRenderer>().material;
-        for (int i = 0; i < this.Vertices.Length; i++)
-            this.Vertices[i].GetComponent<MeshRenderer>().sharedMaterial = this._verticesMat;
+        _verticesMat = Vertices[0].GetComponent<MeshRenderer>().material;
+        for (int i = 0; i < Vertices.Length; i++)
+            Vertices[i].GetComponent<MeshRenderer>().sharedMaterial = _verticesMat;
 
-        this._facesMat = this.Faces[0].GetComponent<MeshRenderer>().material;
-        for (int i = 0; i < this.Faces.Length; i++)
-            this.Faces[i].GetComponent<MeshRenderer>().sharedMaterial = this._facesMat;
+        _facesMat = Faces[0].GetComponent<MeshRenderer>().material;
+        for (int i = 0; i < Faces.Length; i++)
+            Faces[i].GetComponent<MeshRenderer>().sharedMaterial = _facesMat;
 
-        SetUltracube(GetUnrotatedVertices().Select(p => p.Project()).ToArray(), setFaces: true);
+        SetUltracube(GetUnrotatedVertices().Select(p => p.Project()).ToArray());
 
         // RULE SEED
-        var rnd = this.RuleSeedable.GetRNG();
-        this._faces = new List<bool?[]>();
+        var rnd = RuleSeedable.GetRNG();
+        Debug.LogFormat("[The Ultracube #{0}] Using rule seed: {1}", _moduleId, rnd.Seed);
+        _faces = new List<bool?[]>();
 
         for (var i = 0; i < _shapeOrder.Length; i++)
-            for (int iv = 0; iv < 2; iv++)
-                for (var j = i + 1; j < _shapeOrder.Length; j++)
-                    for (int jv = 0; jv < 2; jv++)
-                        for (var k = j + 1; k < _shapeOrder.Length; k++)
-                            for (int kv = 0; kv < 2; kv++)
-                                this._faces.Add(Enumerable.Range(0, 5).Select(d => d == _shapeOrder[i] ? iv != 0 : d == _shapeOrder[j] ? jv != 0 : d == _shapeOrder[k] ? kv != 0 : (bool?)null).ToArray());
-        rnd.ShuffleFisherYates(this._faces);
-        this._colorPermutations = rnd.ShuffleFisherYates(
+            for (var j = i + 1; j < _shapeOrder.Length; j++)
+                for (var k = j + 1; k < _shapeOrder.Length; k++)
+                {
+                    var which1 = rnd.Next(0, 2) != 0;
+                    var which2 = rnd.Next(0, 2) != 0;
+                    switch (rnd.Next(0, 3))
+                    {
+                        case 0:
+                            _faces.Add(Enumerable.Range(0, 5).Select(d => d == _shapeOrder[i] ? false : d == _shapeOrder[j] ? which1 : d == _shapeOrder[k] ? which2 : (bool?) null).ToArray());
+                            _faces.Add(Enumerable.Range(0, 5).Select(d => d == _shapeOrder[i] ? true : d == _shapeOrder[j] ? which1 : d == _shapeOrder[k] ? which2 : (bool?) null).ToArray());
+                            break;
+                        case 1:
+                            _faces.Add(Enumerable.Range(0, 5).Select(d => d == _shapeOrder[i] ? which1 : d == _shapeOrder[j] ? false : d == _shapeOrder[k] ? which2 : (bool?) null).ToArray());
+                            _faces.Add(Enumerable.Range(0, 5).Select(d => d == _shapeOrder[i] ? which1 : d == _shapeOrder[j] ? true : d == _shapeOrder[k] ? which2 : (bool?) null).ToArray());
+                            break;
+                        default:
+                            _faces.Add(Enumerable.Range(0, 5).Select(d => d == _shapeOrder[i] ? which1 : d == _shapeOrder[j] ? which2 : d == _shapeOrder[k] ? false : (bool?) null).ToArray());
+                            _faces.Add(Enumerable.Range(0, 5).Select(d => d == _shapeOrder[i] ? which1 : d == _shapeOrder[j] ? which2 : d == _shapeOrder[k] ? true : (bool?) null).ToArray());
+                            break;
+                    }
+                }
+        rnd.ShuffleFisherYates(_faces);
+        _colorPermutations = rnd.ShuffleFisherYates(
             new[] { "RYGB", "RYBG", "RGYB", "RGBY", "RBYG", "RBGY", "YRGB", "YRBG", "YGRB", "YGBR", "YBRG", "YBGR", "GRYB", "GRBY", "GYRB", "GYBR", "GBRY", "GBYR", "BRYG", "BRGY", "BYRG", "BYGR", "BGRY", "BGYR" }
                 .Select(str => str.Select(ch => "RYGB".IndexOf(ch)).ToArray()).ToArray()
         ).Take(20).ToArray();
-        Debug.Log("F = " + this._faces.Count);
+
+        Debug.LogFormat("<The Ultracube #{0}> Rules:\n{1}", _moduleId, Enumerable.Range(0, _rotationNames.Length).Select(ix => string.Format("{0}={1}", _rotationNames[ix], StringifyShape(_faces[ix]))).Join("\n"));
 
         // GENERATE PUZZLE
-        this._rotations = new int[5];
-        for (int i = 0; i < this._rotations.Length; i++)
+        _rotations = new int[5];
+        for (int i = 0; i < _rotations.Length; i++)
         {
             var axes = "XYZWV".ToArray().Shuffle();
-            this._rotations[i] = Array.IndexOf(_rotationNames, string.Concat(axes[0], axes[1]));
+            _rotations[i] = Array.IndexOf(_rotationNames, string.Concat(axes[0], axes[1]));
         }
-        Debug.LogFormat(@"[The Ultracube #{0}] Rotations are: {1}", this._moduleId, this._rotations.Select(rot => _rotationNames[rot]).Join(", "));
 
+        // ## FOR CREATING THE “ALL ROTATIONS” GIF
+        //if (_moduleId >= 1 && _moduleId <= 20)
+        //{
+        //    _rotations = new int[5] { _moduleId - 1, _moduleId - 1, _moduleId - 1, _moduleId - 1, _moduleId - 1 };
+        //    RotationText.text = _rotationNames[_moduleId - 1];
+        //    RotationText.gameObject.SetActive(true);
+        //}
+        //else
+        //    RotationText.gameObject.SetActive(false);
+        // ## END
 
-       //  manual generation code
-       /*
-        var seq = "XY,XZ,XW,XV,YZ,YW,YV,ZW,ZV,WV".Split(',').ToList();
-        Debug.Log("All rotations are: "+seq.Join(" "));
-        string row = "<tr><th>{0}</th><td class=\"face\">{1}</td><td class=\"order\">{2}</td><th>{3}</th><td class=\"face\">{4}</td><td class=\"order\">{5}</td></tr>\n";
-        string table = ""; // table html result
-
-
-        for (int i = 0; i < seq.Count; i++)
-        {
-            table += string.Format(row,
-                 seq[i],
-                StringifyShape(_faces[Array.IndexOf(_rotationNames, seq[i])]).Replace(" face",null),
-                _colorPermutations[Array.IndexOf(_rotationNames, seq[i])].Select(x => _colorNames[x].ToUpperInvariant().First()).Join(""),
-                 seq[i].Reverse().Join(""),
-                StringifyShape(_faces[Array.IndexOf(_rotationNames, seq[i][1].ToString() + seq[i][0])]).Replace(" face", null),
-                _colorPermutations[Array.IndexOf(_rotationNames, seq[i][1].ToString() + seq[i][0])].Select(x => _colorNames[x].ToUpperInvariant().First()).Join("")); ;
-        }         
-        */
+        Debug.LogFormat(@"[The Ultracube #{0}] Rotations are: {1}", _moduleId, _rotations.Select(rot => _rotationNames[rot]).Join(", "));
 
         for (var i = 0; i < 1 << 5; i++)
-            this.Vertices[i].OnInteract = VertexClick(i);
+            Vertices[i].OnInteract = VertexClick(i);
 
-        this._rotationCoroutine = StartCoroutine(RotateUltracube());
+        _rotationCoroutine = StartCoroutine(RotateUltracube());
     }
 
     private Point5D[] GetUnrotatedVertices()
@@ -129,24 +137,24 @@ public class TheUltracubeModule : MonoBehaviour
     {
         return delegate
         {
-            this.Vertices[v].AddInteractionPunch(.2f);
-            if (this._transitioning)
+            Vertices[v].AddInteractionPunch(.2f);
+            if (_transitioning)
                 return false;
 
-            if (this._rotationCoroutine != null)
+            if (_rotationCoroutine != null)
             {
-                this._progress = 0;
+                _progress = 0;
                 StartCoroutine(ColorChange(setVertexColors: true));
             }
-            else if (v == this._correctVertex)
+            else if (v == _correctVertex)
             {
-                this._progress++;
-                if (this._progress == 4)
+                _progress++;
+                if (_progress == 4)
                 {
-                    Debug.LogFormat(@"[The Ultracube #{0}] Module solved.", this._moduleId);
-                    this.Module.HandlePass();
+                    Debug.LogFormat(@"[The Ultracube #{0}] Module solved.", _moduleId);
+                    Module.HandlePass();
                     StartCoroutine(ColorChange(keepGrey: true));
-                    this.Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, this.transform);
+                    Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
                 }
                 else
                 {
@@ -155,9 +163,9 @@ public class TheUltracubeModule : MonoBehaviour
             }
             else
             {
-                Debug.LogFormat(@"[The Ultracube #{0}] Incorrect vertex {1} pressed; resuming rotations.", this._moduleId, StringifyShape(v));
-                this.Module.HandleStrike();
-                this._rotationCoroutine = StartCoroutine(RotateUltracube(delay: true));
+                Debug.LogFormat(@"[The Ultracube #{0}] Incorrect vertex {1} pressed; resuming rotations.", _moduleId, StringifyShape(v));
+                Module.HandleStrike();
+                _rotationCoroutine = StartCoroutine(RotateUltracube(delay: true));
             }
             return false;
         };
@@ -176,14 +184,14 @@ public class TheUltracubeModule : MonoBehaviour
     }
     private string StringifyShape(int vertex)
     {
-        return StringifyShape(Enumerable.Range(0, 5).Select(d => (bool?)((vertex & (1 << d)) != 0)).ToArray());
+        return StringifyShape(Enumerable.Range(0, 5).Select(d => (bool?) ((vertex & (1 << d)) != 0)).ToArray());
     }
 
     private IEnumerator ColorChange(bool keepGrey = false, bool setVertexColors = false, bool delay = false)
     {
-        this._transitioning = true;
-        for (int i = 0; i < this.Vertices.Length; i++)
-            this.Vertices[i].GetComponent<MeshRenderer>().sharedMaterial = this._verticesMat;
+        _transitioning = true;
+        for (int i = 0; i < Vertices.Length; i++)
+            Vertices[i].GetComponent<MeshRenderer>().sharedMaterial = _verticesMat;
 
         var prevHue = .5f;
         var prevSat = 0f;
@@ -195,32 +203,32 @@ public class TheUltracubeModule : MonoBehaviour
 
         yield return new WaitForSeconds(delay ? 2.22f : .22f);
 
-        this._hue = Rnd.Range(0f, 1f);
-        this._sat = Rnd.Range(.6f, .9f);
-        this._v = Rnd.Range(.75f, 1f);
+        _hue = Rnd.Range(0f, 1f);
+        _sat = Rnd.Range(.6f, .9f);
+        _v = Rnd.Range(.75f, 1f);
 
         var duration = 1.5f;
         var elapsed = 0f;
         while (elapsed < duration)
         {
-            SetColor(Mathf.Lerp(prevHue, this._hue, elapsed / duration), Mathf.Lerp(prevSat, this._sat, elapsed / duration), Mathf.Lerp(prevV, this._v, elapsed / duration));
+            SetColor(Mathf.Lerp(prevHue, _hue, elapsed / duration), Mathf.Lerp(prevSat, _sat, elapsed / duration), Mathf.Lerp(prevV, _v, elapsed / duration));
             yield return null;
             elapsed += Time.deltaTime;
         }
-        SetColor(this._hue, this._sat, this._v);
+        SetColor(_hue, _sat, _v);
 
         if (setVertexColors)
         {
-            yield return new WaitUntil(() => this._rotationCoroutine == null);
+            yield return new WaitUntil(() => _rotationCoroutine == null);
             PlayRandomSound();
 
-            var desiredFace = this._faces[this._rotations[this._progress]];
+            var desiredFace = _faces[_rotations[_progress]];
             var initialColors = Enumerable.Range(0, 4).ToList();
             var q = new Queue<int>();
             var colors = new int?[1 << 5];
 
-            Debug.LogFormat(@"[The Ultracube #{0}] Stage {1} correct face: {2}", this._moduleId, this._progress + 1, StringifyShape(desiredFace));
-            Debug.LogFormat(@"[The Ultracube #{0}] Stage {1} correct color: {2}", this._moduleId, this._progress + 1, _colorNames[this._colorPermutations[this._rotations[4]][this._progress]]);
+            Debug.LogFormat(@"[The Ultracube #{0}] Stage {1} correct face: {2}", _moduleId, _progress + 1, StringifyShape(desiredFace));
+            Debug.LogFormat(@"[The Ultracube #{0}] Stage {1} correct color: {2}", _moduleId, _progress + 1, _colorNames[_colorPermutations[_rotations[4]][_progress]]);
 
             // Assign the four colors on the desired face
             for (int v = 0; v < 1 << 5; v++)
@@ -233,10 +241,10 @@ public class TheUltracubeModule : MonoBehaviour
                     for (var d = 0; d < 5; d++)
                         q.Enqueue(v ^ (1 << d));
 
-                    if (colors[v].Value == this._colorPermutations[this._rotations[4]][this._progress])
+                    if (colors[v].Value == _colorPermutations[_rotations[4]][_progress])
                     {
-                        this._correctVertex = v;
-                        Debug.LogFormat(@"[The Ultracube #{0}] Stage {1} correct vertex: {2}", this._moduleId, this._progress + 1, StringifyShape(this._correctVertex));
+                        _correctVertex = v;
+                        Debug.LogFormat(@"[The Ultracube #{0}] Stage {1} correct vertex: {2}", _moduleId, _progress + 1, StringifyShape(_correctVertex));
                     }
                 }
             }
@@ -265,26 +273,26 @@ public class TheUltracubeModule : MonoBehaviour
                     q.Enqueue(vx ^ (1 << cs[d]));
             }
 
-            this._vertexColors = colors.Select(v => v.Value).ToArray();
+            _vertexColors = colors.Select(v => v.Value).ToArray();
             for (int v = 0; v < 1 << 5; v++)
-                this.Vertices[v].GetComponent<MeshRenderer>().material.color = _vertexColorValues[this._vertexColors[v]];
+                Vertices[v].GetComponent<MeshRenderer>().material.color = _vertexColorValues[_vertexColors[v]];
         }
 
-        this._transitioning = false;
+        _transitioning = false;
     }
 
     private void PlayRandomSound()
     {
-        this.Audio.PlaySoundAtTransform("Bleep" + Rnd.Range(1, 11), this.transform);
+        Audio.PlaySoundAtTransform("Bleep" + Rnd.Range(1, 11), transform);
     }
 
     private void SetColor(float h, float s, float v)
     {
-        this._edgesMat.color = Color.HSVToRGB(h, s, v);
-        this._verticesMat.color = Color.HSVToRGB(h, s * .8f, v * .5f);
+        _edgesMat.color = Color.HSVToRGB(h, s, v);
+        _verticesMat.color = Color.HSVToRGB(h, s * .8f, v * .5f);
         var clr = Color.HSVToRGB(h, s * .8f, v * .75f);
         clr.a = .1f;
-        this._facesMat.color = clr;
+        _facesMat.color = clr;
     }
 
     private IEnumerator RotateUltracube(bool delay = false)
@@ -293,17 +301,17 @@ public class TheUltracubeModule : MonoBehaviour
         while (colorChange.MoveNext())
             yield return colorChange.Current;
 
-        var unrotatedVertices = Enumerable.Range(0, 1 << 5).Select(i => new Point5D((i & 1) != 0 ? 1 : -1, (i & 2) != 0 ? 1 : -1, (i & 4) != 0 ? 1 : -1, (i & 8) != 0 ? 1 : -1, (i & 16) != 0 ? 1 : -1)).ToArray();
-        SetUltracube(unrotatedVertices.Select(v => v.Project()).ToArray(), setFaces: true);
+        var unrotatedVertices = GetUnrotatedVertices();
+        SetUltracube(unrotatedVertices.Select(v => v.Project()).ToArray());
 
-        while (!this._transitioning)
+        while (!_transitioning)
         {
             yield return new WaitForSeconds(Rnd.Range(1.75f, 2.25f));
 
-            for (int rot = 0; rot < this._rotations.Length && !this._transitioning; rot++)
+            for (int rot = 0; rot < _rotations.Length && !_transitioning; rot++)
             {
-                var axis1 = "XYZWV".IndexOf(_rotationNames[this._rotations[rot]][0]);
-                var axis2 = "XYZWV".IndexOf(_rotationNames[this._rotations[rot]][1]);
+                var axis1 = "XYZWV".IndexOf(_rotationNames[_rotations[rot]][0]);
+                var axis2 = "XYZWV".IndexOf(_rotationNames[_rotations[rot]][1]);
                 var duration = 2f;
                 var elapsed = 0f;
 
@@ -320,20 +328,20 @@ public class TheUltracubeModule : MonoBehaviour
                                 i == axis2 && j == axis2 ? Mathf.Cos(angle) :
                                 i == j ? 1 : 0;
 
-                    SetUltracube(unrotatedVertices.Select(v => (v * matrix).Project()).ToArray(), setFaces: true);
+                    SetUltracube(unrotatedVertices.Select(v => (v * matrix).Project()).ToArray());
 
                     yield return null;
                     elapsed += Time.deltaTime;
                 }
 
                 // Reset the position of the hypercube
-                SetUltracube(unrotatedVertices.Select(v => v.Project()).ToArray(), setFaces: true);
+                SetUltracube(unrotatedVertices.Select(v => v.Project()).ToArray());
                 yield return new WaitForSeconds(Rnd.Range(.5f, .6f));
             }
         }
 
-        this._transitioning = false;
-        this._rotationCoroutine = null;
+        _transitioning = false;
+        _rotationCoroutine = null;
     }
 
     private static float EaseInOutQuad(float t, float start, float end, float duration)
@@ -346,11 +354,11 @@ public class TheUltracubeModule : MonoBehaviour
         return -change / 2 * (t * (t - 2) - 1) + start;
     }
 
-    private void SetUltracube(Vector3[] vertices, bool setFaces = false)
+    private void SetUltracube(Vector3[] vertices)
     {
         // VERTICES
         for (int i = 0; i < 1 << 5; i++)
-            this.Vertices[i].transform.localPosition = vertices[i];
+            Vertices[i].transform.localPosition = vertices[i];
 
         // EDGES
         var e = 0;
@@ -358,53 +366,50 @@ public class TheUltracubeModule : MonoBehaviour
             for (int j = i + 1; j < 1 << 5; j++)
                 if (((i ^ j) & ((i ^ j) - 1)) == 0)
                 {
-                    this.Edges[e].localPosition = (vertices[i] + vertices[j]) / 2;
-                    this.Edges[e].localRotation = Quaternion.FromToRotation(Vector3.up, vertices[j] - vertices[i]);
-                    this.Edges[e].localScale = new Vector3(.1f, (vertices[j] - vertices[i]).magnitude / 2, .1f);
+                    Edges[e].localPosition = (vertices[i] + vertices[j]) / 2;
+                    Edges[e].localRotation = Quaternion.FromToRotation(Vector3.up, vertices[j] - vertices[i]);
+                    Edges[e].localScale = new Vector3(.1f, (vertices[j] - vertices[i]).magnitude / 2, .1f);
                     e++;
                 }
 
         // FACES
-        if (setFaces)
-        {
-            foreach (var mesh in this._generatedMeshes)
-                Destroy(mesh);
-            this._generatedMeshes.Clear();
+        foreach (var mesh in _generatedMeshes)
+            Destroy(mesh);
+        _generatedMeshes.Clear();
 
-            var f = 0;
-            for (int i = 0; i < 1 << 5; i++)
-                for (int j = i + 1; j < 1 << 5; j++)
+        var f = 0;
+        for (int i = 0; i < 1 << 5; i++)
+            for (int j = i + 1; j < 1 << 5; j++)
+            {
+                var b1 = i ^ j;
+                var b2 = b1 & (b1 - 1);
+                if (b2 != 0 && (b2 & (b2 - 1)) == 0 && (i & b1 & ((i & b1) - 1)) == 0 && (j & b1 & ((j & b1) - 1)) == 0)
                 {
-                    var b1 = i ^ j;
-                    var b2 = b1 & (b1 - 1);
-                    if (b2 != 0 && (b2 & (b2 - 1)) == 0 && (i & b1 & ((i & b1) - 1)) == 0 && (j & b1 & ((j & b1) - 1)) == 0)
-                    {
-                        var mesh = new Mesh { vertices = new[] { vertices[i], vertices[i | j], vertices[i & j], vertices[j] }, triangles = new[] { 0, 1, 2, 1, 2, 3, 2, 1, 0, 3, 2, 1 } };
-                        mesh.RecalculateNormals();
-                        this._generatedMeshes.Add(mesh);
-                        this.Faces[f].sharedMesh = mesh;
-                        f++;
-                    }
+                    var mesh = new Mesh { vertices = new[] { vertices[i], vertices[i | j], vertices[i & j], vertices[j] }, triangles = new[] { 0, 1, 2, 1, 2, 3, 2, 1, 0, 3, 2, 1 } };
+                    mesh.RecalculateNormals();
+                    _generatedMeshes.Add(mesh);
+                    Faces[f].sharedMesh = mesh;
+                    f++;
                 }
-        }
+            }
     }
 
     // copied from the original hypercube module.
 #pragma warning disable 414
-    public readonly string TwitchHelpMessage = @"!{0} go [makes the ultracube stop rotating] | !{0} zig-bottom-front-left [presses a vertex when the hypercube is not rotating anymore]";
+    private readonly string TwitchHelpMessage = @"!{0} go [use when ultracube is rotating] | !{0} pong-zig-bottom-front-left [presses a vertex when the ultracube is not rotating]";
 #pragma warning restore 414
 
-    public IEnumerator ProcessTwitchCommand(string command)
+    IEnumerator ProcessTwitchCommand(string command)
     {
-        if (this._rotationCoroutine != null && Regex.IsMatch(command, @"^\s*(go|activate|stop|run|start|on|off)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        if (_rotationCoroutine != null && Regex.IsMatch(command, @"^\s*(go|activate|stop|run|start|on|off)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
-            yield return new[] { this.Vertices[0] };
+            yield return new[] { Vertices[0] };
             yield break;
         }
 
         Match m;
-        if (this._rotationCoroutine == null && (m = Regex.Match(command, string.Format(@"^\s*((?:{0})(?:[- ,;]*(?:{0}))*)\s*$", _dimensionNames.SelectMany(x => x).Join("|")), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
+        if (_rotationCoroutine == null && (m = Regex.Match(command, string.Format(@"^\s*((?:{0})(?:[- ,;]*(?:{0}))*)\s*$", _dimensionNames.SelectMany(x => x).Join("|")), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
         {
             var elements = m.Groups[1].Value.Split(new[] { ' ', ',', ';', '-' }, StringSplitOptions.RemoveEmptyEntries);
             if (elements.Length != 5)
@@ -412,7 +417,7 @@ public class TheUltracubeModule : MonoBehaviour
                 yield return "sendtochaterror Dude, it’s a 5D ultracube, you gotta have 5 dimensions.";
                 yield break;
             }
-            var dimensions = elements.Select(el => _dimensionNames.ToList().FindIndex(d => d.Any(dn => dn.EqualsIgnoreCase(el)))).ToArray();
+            var dimensions = elements.Select(el => _dimensionNames.IndexOf(d => d.Any(dn => dn.EqualsIgnoreCase(el)))).ToArray();
             var invalid = Enumerable.Range(0, 4).SelectMany(i => Enumerable.Range(i + 1, 4 - i).Where(j => dimensions[i] == dimensions[j]).Select(j => new { i, j })).FirstOrDefault();
             if (invalid != null)
             {
@@ -423,9 +428,9 @@ public class TheUltracubeModule : MonoBehaviour
             }
             var vertexIx = 0;
             for (int i = 0; i < 5; i++)
-                vertexIx |= _dimensionNames[dimensions[i]].ToList().FindIndex(dn => dn.EqualsIgnoreCase(elements[i])) << dimensions[i];
+                vertexIx |= _dimensionNames[dimensions[i]].IndexOf(dn => dn.EqualsIgnoreCase(elements[i])) << dimensions[i];
             yield return null;
-            yield return new[] { this.Vertices[vertexIx] };
+            yield return new[] { Vertices[vertexIx] };
         }
     }
 

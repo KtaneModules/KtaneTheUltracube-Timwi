@@ -21,7 +21,7 @@ namespace TheUltracube
 
         private static readonly float wLen = .2f;//1 / Mathf.Sqrt(3);
         private static readonly Vector3 wVec = new Vector3(2 * wLen, 2 * wLen, wLen);
-        private static readonly Vector3 vVec = new Vector3(-wLen, -2 * wLen, -2 * wLen);
+        private static readonly Vector3 vVec = new Vector3(wLen, 2 * wLen, 2 * wLen);
 
         public Vector3 Project()
         {
