@@ -394,7 +394,6 @@ public class TheUltracubeModule : MonoBehaviour
             }
     }
 
-    // copied from the original hypercube module.
 #pragma warning disable 414
     private readonly string TwitchHelpMessage = @"!{0} go [use when ultracube is rotating] | !{0} pong-zig-bottom-front-left [presses a vertex when the ultracube is not rotating]";
 #pragma warning restore 414
