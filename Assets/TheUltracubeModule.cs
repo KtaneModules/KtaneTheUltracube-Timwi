@@ -23,7 +23,7 @@ public class TheUltracubeModule : MonoBehaviour
     public KMSelectable[] Vertices;
     public MeshFilter[] Faces;
     public Mesh Quad;
-    public Material FaceMaterial;
+    public TextMesh RotationText;
 
     // Rule-seed
     private int[][] _colorPermutations;
@@ -39,6 +39,10 @@ public class TheUltracubeModule : MonoBehaviour
     private int _progress;
     private int[] _vertexColors;
     private int _correctVertex;
+
+    // Long-press handling
+    private bool _isButtonDown;
+    private Coroutine _buttonDownCoroutine;
 
     private Material _edgesMat, _verticesMat, _facesMat;
     private readonly List<Mesh> _generatedMeshes = new List<Mesh>();
@@ -123,7 +127,10 @@ public class TheUltracubeModule : MonoBehaviour
         Debug.LogFormat(@"[The Ultracube #{0}] Rotations are: {1}", _moduleId, _rotations.Select(rot => _rotationNames[rot]).Join(", "));
 
         for (var i = 0; i < 1 << 5; i++)
+        {
             Vertices[i].OnInteract = VertexClick(i);
+            Vertices[i].OnInteractEnded = VertexRelease(i);
+        }
 
         _rotationCoroutine = StartCoroutine(RotateUltracube());
     }
@@ -138,9 +145,51 @@ public class TheUltracubeModule : MonoBehaviour
         return delegate
         {
             Vertices[v].AddInteractionPunch(.2f);
-            if (_transitioning)
-                return false;
+            if (!_transitioning && _progress < 4)
+                _buttonDownCoroutine = StartCoroutine(HandleLongPress(v));
+            return false;
+        };
+    }
 
+    private IEnumerator HandleLongPress(int v)
+    {
+        if (_transitioning || _progress == 4)
+            yield break;
+
+        _isButtonDown = true;
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Vertices[v].transform);
+
+        yield return new WaitForSeconds(.7f);
+        _isButtonDown = false;
+        _buttonDownCoroutine = null;
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonRelease, Vertices[v].transform);
+
+        // Handle long press
+        if (_rotationCoroutine == null)
+        {
+            _rotationCoroutine = StartCoroutine(RotateUltracube(delay: true));
+            Debug.LogFormat("[The Ultracube #{0}] Module reset.", _moduleId);
+        }
+    }
+
+    private Action VertexRelease(int v)
+    {
+        return delegate
+        {
+            if (!_isButtonDown || _progress == 4)
+                return;
+
+            if (_buttonDownCoroutine != null)
+            {
+                StopCoroutine(_buttonDownCoroutine);
+                _buttonDownCoroutine = null;
+            }
+
+            if (!_isButtonDown) // Long press already handled by HandleLogPress()
+                return;
+
+            // Handle short press
+            _isButtonDown = false;
             if (_rotationCoroutine != null)
             {
                 _progress = 0;
@@ -167,7 +216,6 @@ public class TheUltracubeModule : MonoBehaviour
                 Module.HandleStrike();
                 _rotationCoroutine = StartCoroutine(RotateUltracube(delay: true));
             }
-            return false;
         };
     }
 
@@ -317,7 +365,7 @@ public class TheUltracubeModule : MonoBehaviour
 
                 while (elapsed < duration)
                 {
-                    var angle = EaseInOutQuad(elapsed, 0, Mathf.PI / 2, duration);
+                    var angle = easeInOutQuad(elapsed, 0, Mathf.PI / 2, duration);
                     var matrix = new double[25];
                     for (int i = 0; i < 5; i++)
                         for (int j = 0; j < 5; j++)
@@ -334,7 +382,7 @@ public class TheUltracubeModule : MonoBehaviour
                     elapsed += Time.deltaTime;
                 }
 
-                // Reset the position of the hypercube
+                // Reset the position of the ultracube
                 SetUltracube(unrotatedVertices.Select(v => v.Project()).ToArray());
                 yield return new WaitForSeconds(Rnd.Range(.5f, .6f));
             }
@@ -344,7 +392,7 @@ public class TheUltracubeModule : MonoBehaviour
         _rotationCoroutine = null;
     }
 
-    private static float EaseInOutQuad(float t, float start, float end, float duration)
+    private static float easeInOutQuad(float t, float start, float end, float duration)
     {
         var change = end - start;
         t /= duration / 2;
@@ -395,7 +443,7 @@ public class TheUltracubeModule : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} go [use when ultracube is rotating] | !{0} pong-zig-bottom-front-left [presses a vertex when the ultracube is not rotating]";
+    private readonly string TwitchHelpMessage = @"!{0} go [use when ultracube is rotating] | !{0} pong-zig-bottom-front-left [presses a vertex when the ultracube is not rotating] | !{0} reset [forget input and resume rotations]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
@@ -404,6 +452,15 @@ public class TheUltracubeModule : MonoBehaviour
         {
             yield return null;
             yield return new[] { Vertices[0] };
+            yield break;
+        }
+
+        if (_rotationCoroutine == null && Regex.IsMatch(command, @"^\s*(reset|go back|return|resume|rotate|rotations|cancel|abort)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            Vertices[0].OnInteract();
+            yield return new WaitForSeconds(1f);
+            Vertices[0].OnInteractEnded();
             yield break;
         }
 
@@ -432,6 +489,4 @@ public class TheUltracubeModule : MonoBehaviour
             yield return new[] { Vertices[vertexIx] };
         }
     }
-
-    // -- end copy --
 }
