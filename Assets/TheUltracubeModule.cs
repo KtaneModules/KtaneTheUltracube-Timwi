@@ -24,6 +24,7 @@ public class TheUltracubeModule : MonoBehaviour
     public MeshFilter[] Faces;
     public Mesh Quad;
     public TextMesh RotationText;
+    public GameObject[] ProgressLights;
 
     // Rule-seed
     private int[][] _colorPermutations;
@@ -165,7 +166,7 @@ public class TheUltracubeModule : MonoBehaviour
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonRelease, Vertices[v].transform);
 
         // Handle long press
-        if (_rotationCoroutine == null)
+        if (_rotationCoroutine == null && _progress < 4)
         {
             _rotationCoroutine = StartCoroutine(RotateUltracube(delay: true));
             Debug.LogFormat("[The Ultracube #{0}] Module reset.", _moduleId);
@@ -200,6 +201,8 @@ public class TheUltracubeModule : MonoBehaviour
                 _progress++;
                 if (_progress == 4)
                 {
+                    foreach (var light in ProgressLights)
+                        light.SetActive(false);
                     Debug.LogFormat(@"[The Ultracube #{0}] Module solved.", _moduleId);
                     Module.HandlePass();
                     StartCoroutine(ColorChange(keepGrey: true));
@@ -207,6 +210,7 @@ public class TheUltracubeModule : MonoBehaviour
                 }
                 else
                 {
+                    ProgressLights[_progress - 1].SetActive(true);
                     StartCoroutine(ColorChange(setVertexColors: true));
                 }
             }
@@ -345,6 +349,9 @@ public class TheUltracubeModule : MonoBehaviour
 
     private IEnumerator RotateUltracube(bool delay = false)
     {
+        foreach (var light in ProgressLights)
+            light.SetActive(false);
+
         var colorChange = ColorChange(delay: delay);
         while (colorChange.MoveNext())
             yield return colorChange.Current;
