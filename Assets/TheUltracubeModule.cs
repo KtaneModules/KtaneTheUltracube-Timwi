@@ -21,7 +21,7 @@ public class TheUltracubeModule : MonoBehaviour
     public Transform Ultracube;
     public Transform[] Edges;
     public KMSelectable[] Vertices;
-    public MeshFilter[] Faces;
+    public MeshFilter Faces;
     public Mesh Quad;
     public TextMesh RotationText;
     public GameObject[] ProgressLights;
@@ -46,7 +46,7 @@ public class TheUltracubeModule : MonoBehaviour
     private Coroutine _buttonDownCoroutine;
 
     private Material _edgesMat, _verticesMat, _facesMat;
-    private readonly List<Mesh> _generatedMeshes = new List<Mesh>();
+    private Mesh _lastFacesMesh = null;
     private static readonly string[] _rotationNames = new[] { "XY", "YX", "XZ", "ZX", "XW", "WX", "XV", "VX", "YZ", "ZY", "YW", "WY", "YV", "VY", "ZW", "WZ", "ZV", "VZ", "WV", "VW" };
     private static readonly string[][] _dimensionNames = new[] { new[] { "left", "right" }, new[] { "bottom", "top" }, new[] { "front", "back" }, new[] { "zig", "zag" }, new[] { "ping", "pong" } };
     private static readonly string[] _colorNames = new[] { "red", "yellow", "green", "blue" };
@@ -65,9 +65,7 @@ public class TheUltracubeModule : MonoBehaviour
         for (int i = 0; i < Vertices.Length; i++)
             Vertices[i].GetComponent<MeshRenderer>().sharedMaterial = _verticesMat;
 
-        _facesMat = Faces[0].GetComponent<MeshRenderer>().material;
-        for (int i = 0; i < Faces.Length; i++)
-            Faces[i].GetComponent<MeshRenderer>().sharedMaterial = _facesMat;
+        _facesMat = Faces.GetComponent<MeshRenderer>().material;
 
         SetUltracube(GetUnrotatedVertices().Select(p => p.Project()).ToArray());
 
@@ -428,11 +426,11 @@ public class TheUltracubeModule : MonoBehaviour
                 }
 
         // FACES
-        foreach (var mesh in _generatedMeshes)
-            Destroy(mesh);
-        _generatedMeshes.Clear();
+        if (_lastFacesMesh != null)
+            Destroy(_lastFacesMesh);
 
         var f = 0;
+        var triangles = new List<int>();
         for (int i = 0; i < 1 << 5; i++)
             for (int j = i + 1; j < 1 << 5; j++)
             {
@@ -440,13 +438,13 @@ public class TheUltracubeModule : MonoBehaviour
                 var b2 = b1 & (b1 - 1);
                 if (b2 != 0 && (b2 & (b2 - 1)) == 0 && (i & b1 & ((i & b1) - 1)) == 0 && (j & b1 & ((j & b1) - 1)) == 0)
                 {
-                    var mesh = new Mesh { vertices = new[] { vertices[i], vertices[i | j], vertices[i & j], vertices[j] }, triangles = new[] { 0, 1, 2, 1, 2, 3, 2, 1, 0, 3, 2, 1 } };
-                    mesh.RecalculateNormals();
-                    _generatedMeshes.Add(mesh);
-                    Faces[f].sharedMesh = mesh;
+                    triangles.AddRange(new[] { i, i | j, i & j, i | j, i & j, j, i & j, i | j, i, j, i & j, i | j });
                     f++;
                 }
             }
+        _lastFacesMesh = new Mesh { vertices = vertices, triangles = triangles.ToArray() };
+        _lastFacesMesh.RecalculateNormals();
+        Faces.sharedMesh = _lastFacesMesh;
     }
 
 #pragma warning disable 414
