@@ -475,7 +475,7 @@ public class TheUltracubeModule : MonoBehaviour
             var elements = m.Groups[1].Value.Split(new[] { ' ', ',', ';', '-' }, StringSplitOptions.RemoveEmptyEntries);
             if (elements.Length != 5)
             {
-                yield return "sendtochaterror Dude, it’s a 5D ultracube, you gotta have 5 dimensions.";
+                yield return "sendtochaterror It’s a 5D ultracube, you gotta have 5 dimensions.";
                 yield break;
             }
             var dimensions = elements.Select(el => _dimensionNames.IndexOf(d => d.Any(dn => dn.EqualsIgnoreCase(el)))).ToArray();
@@ -483,8 +483,8 @@ public class TheUltracubeModule : MonoBehaviour
             if (invalid != null)
             {
                 yield return elements[invalid.i].EqualsIgnoreCase(elements[invalid.j])
-                    ? string.Format("sendtochaterror Dude, you wrote “{0}” twice.", elements[invalid.i], elements[invalid.j])
-                    : string.Format("sendtochaterror Dude, “{0}” and “{1}” doesn’t jive.", elements[invalid.i], elements[invalid.j]);
+                    ? string.Format("sendtochaterror You wrote “{0}” twice.", elements[invalid.i], elements[invalid.j])
+                    : string.Format("sendtochaterror “{0}” and “{1}” doesn’t jive.", elements[invalid.i], elements[invalid.j]);
                 yield break;
             }
             var vertexIx = 0;
