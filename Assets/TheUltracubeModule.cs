@@ -370,7 +370,7 @@ public class TheUltracubeModule : MonoBehaviour
 
                 while (elapsed < duration)
                 {
-                    var angle = easeInOutQuad(elapsed, 0, Mathf.PI / 2, duration);
+                    var angle = Easing.InOutQuad(elapsed, 0, Mathf.PI / 2, duration);
                     var matrix = new double[25];
                     for (int i = 0; i < 5; i++)
                         for (int j = 0; j < 5; j++)
@@ -393,18 +393,7 @@ public class TheUltracubeModule : MonoBehaviour
             }
         }
 
-        _transitioning = false;
         _rotationCoroutine = null;
-    }
-
-    private static float easeInOutQuad(float t, float start, float end, float duration)
-    {
-        var change = end - start;
-        t /= duration / 2;
-        if (t < 1)
-            return change / 2 * t * t + start;
-        t--;
-        return -change / 2 * (t * (t - 2) - 1) + start;
     }
 
     private void SetUltracube(Vector3[] vertices)
@@ -493,5 +482,32 @@ public class TheUltracubeModule : MonoBehaviour
             yield return null;
             yield return new[] { Vertices[vertexIx] };
         }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (_rotationCoroutine != null)
+        {
+            Vertices[0].OnInteract();
+            yield return new WaitForSeconds(.1f);
+            Vertices[0].OnInteractEnded();
+            yield return new WaitForSeconds(.1f);
+        }
+
+        while (_progress < 4)
+        {
+            while (_transitioning)
+                yield return true;
+            yield return new WaitForSeconds(.1f);
+
+            var correctVertex = _correctVertex;
+            Vertices[correctVertex].OnInteract();
+            yield return new WaitForSeconds(.1f);
+            Vertices[correctVertex].OnInteractEnded();
+            yield return new WaitForSeconds(.1f);
+        }
+
+        while (_transitioning)
+            yield return true;
     }
 }
